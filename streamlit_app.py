@@ -23,7 +23,7 @@ soup = BeautifulSoup(data, 'html5lib')
 # Find the html table in the web page
 table = soup.find('tbody').find_all('tr')
 
-offensive_data = pd.DataFrame(columns= ['National selection','GP', 'S', 'SOG', 'SOP', 'SOFF', 'SAB', 'POS', 'C','CS', 'P', 'PC', 'PL', 'PLC', 'CK', 'OFF'])
+offensive_data = pd.DataFrame(columns= ['National selection','Games Played', 'Shots', 'Shots On Goal', 'Shots On Post', 'Shots Off Target', 'Shot Attempts Blocked', 'Possession Time Minutes Avg', 'Crosses','Crosses Successful', 'Passes', 'Pass Completions', 'Pass Attempts - Long', 'Pass Completions - Long', 'Corner Kicks', 'Offsides'])
 
 for row in soup.find('tbody').find_all('tr'):
     col = row.find_all("td")
@@ -44,14 +44,136 @@ for row in soup.find('tbody').find_all('tr'):
     ck = col[15].text
     off = col[16].text
 
-    offensive_data = offensive_data.append({'National selection':ns, 'GP':gp, 'S':s, 'SOG':sog, 'SOP':sop, 'SOFF':soff, 'SAB':sab, 'POS':pos, 'C':c,'CS':cs, 'P':p, 'PC':pc, 'PL':pl, 'PLC':plc, 'CK':ck, 'OFF':off}, ignore_index=True)
+    offensive_data = offensive_data.append({'National selection':ns, 'Games Played':gp, 'Shots':s, 'Shots On Goal':sog, 'Shots On Post':sop, 'Shots Off Target':soff, 'Shot Attempts Blocked':sab, 'Possession Time Minutes Avg':pos, 'Crosses':c,'Crosses Successful':cs, 'Passes':p, 'Pass Completions':pc, 'Pass Attempts - Long':pl, 'Pass Completions - Long':plc, 'Corner Kicks':ck, 'Offsides':off}, ignore_index=True)
 
 offensive_data[offensive_data.columns] = offensive_data.apply(lambda x: x.str.strip())
 
-offensive_data["P"]=offensive_data["P"].replace(",", "", regex=True)
-offensive_data["PC"]=offensive_data["PC"].replace(",", "", regex=True)
+offensive_data["Passes"]=offensive_data["Passes"].replace(",", "", regex=True)
+offensive_data["Pass Completions"]=offensive_data["Pass Completions"].replace(",", "", regex=True)
 
 offensive_data.iloc[:,1:] = offensive_data.iloc[:,1:].astype(int)
+
+
+# Scrap defensive data
+
+# Web page to scrap defensive data
+
+url2 = 'https://www.foxsports.com/soccer/fifa-world-cup-men/team-stats?category=defensive&sort=t_int&season=2022&sortOrder=desc&groupId=12'
+
+# Download the content
+
+data2 = requests.get(url2).text
+
+# Creation of the BeatifulSoup object
+soup2 = BeautifulSoup(data2, 'html5lib')
+
+# Find the html table in the web page
+table = soup2.find('tbody').find_all('tr')
+
+defensive_data = pd.DataFrame(columns= ['National selection','Games Played', 'Throw Ins', 'Interceptions', 'Tackles', 'Tackles Attempted', 'Goal Kicks', 'Fouls', 'Free Kicks','Own Goals'])
+
+for row in soup2.find('tbody').find_all('tr'):
+    col = row.find_all("td")
+    ns = col[1].text
+    gp = col[2].text
+    ti = col[3].text
+    ints = col[4].text
+    tkl = col[5].text
+    ta = col[6].text
+    gk = col[7].text
+    f = col[8].text
+    fk = col[9].text
+    og = col[10].text
+
+    defensive_data = defensive_data.append({'National selection':ns, 'Games Played':gp ,'Throw Ins':ti, 'Interceptions':ints, 'Tackles':tkl, 'Tackles Attempted':ta, 'Goal Kicks':gk, 'Fouls':f, 'Free Kicks':fk, 'Own Goals':og}, ignore_index=True)
+
+defensive_data[defensive_data.columns] = defensive_data.apply(lambda x: x.str.strip())
+
+defensive_data.iloc[:,1:] = defensive_data.iloc[:,1:].astype(int)
+
+
+# Scrap general data
+
+# Web page to scrap global data
+
+url3 = 'https://www.foxsports.com/soccer/fifa-world-cup-men/team-stats?category=standard&sort=t_g&season=2022&sortOrder=desc&groupId=12'
+
+# Download the content
+
+data3 = requests.get(url3).text
+
+# Creation of the BeatifulSoup object
+soup3 = BeautifulSoup(data3, 'html5lib')
+
+# Find the html table in the web page
+table = soup3.find('tbody').find_all('tr')
+
+global_data = pd.DataFrame(columns= ['National selection','Games Played', 'Goals', 'Kicked Goals', 'Header Goals', 'Goals First Half', 'Goals Second Half', 'Goals Conceded', 'Goals Conceded First Half','Goals Conceded Second Half', 'Assists', 'Penalty Kicks', 'Penalty Kick Goals', 'Yellow Cards', 'Red Cards', 'Yellow Red Cards'])
+
+for row in soup3.find('tbody').find_all('tr'):
+    col = row.find_all("td")
+    ns = col[1].text
+    gp = col[2].text
+    gf = col[3].text
+    kg = col[4].text
+    hg = col[5].text
+    g1 = col[6].text
+    g2 = col[7].text
+    gc = col[8].text
+    gc1 = col[9].text
+    gc2 = col[10].text
+    a = col[11].text
+    pk = col[12].text
+    pkg = col[13].text
+    yc = col[14].text
+    rc = col[15].text
+    yrc = col[16].text
+
+
+    global_data = global_data.append({'National selection':ns,'Games Played':gp, 'Goals':gf, 'Kicked Goals':kg, 'Header Goals':hg, 'Goals First Half':g1, 'Goals Second Half':g2, 'Goals Conceded':gc, 'Goals Conceded First Half':gc1,'Goals Conceded Second Half':gc2, 'Assists':a, 'Penalty Kicks':pk, 'Penalty Kick Goals':pkg, 'Yellow Cards':yc, 'Red Cards':rc, 'Yellow Red Cards':yrc}, ignore_index=True)
+
+global_data[global_data.columns] = global_data.apply(lambda x: x.str.strip())
+
+global_data.iloc[:,1:] = global_data.iloc[:,1:].astype(int)
+
+
+# Scrap goalkeeping data
+
+# Web page to scrap goalkeeping data
+
+url4 = 'https://www.foxsports.com/soccer/fifa-world-cup-men/team-stats?category=standard&sort=t_g&season=2022&sortOrder=desc&groupId=12'
+
+# Download the content
+
+data4 = requests.get(url4).text
+
+# Creation of the BeatifulSoup object
+soup4 = BeautifulSoup(data4, 'html5lib')
+
+# Find the html table in the web page
+table = soup4.find('tbody').find_all('tr')
+
+goalkeeping_data = pd.DataFrame(columns= ['National selection','Games Played', 'Goals Conceded', 'Shots', 'Shots On Goal', 'Saves', 'Clearances', 'Clean Sheets', 'Penalty Kicks','Penalty Kick Goals'])
+
+for row in soup4.find('tbody').find_all('tr'):
+    col = row.find_all("td")
+    ns = col[1].text
+    gp = col[2].text
+    gc = col[3].text
+    s = col[4].text
+    sog = col[5].text
+    sv = col[6].text
+    clr = col[7].text
+    cs = col[8].text
+    pk = col[9].text
+    pkg = col[10].text
+
+
+    goalkeeping_data = goalkeeping_data.append({'National selection':ns,'Games Played':gp, 'Goals Conceded':gc, 'Shots':s, 'Shots On Goal':sog, 'Saves':sv, 'Clearances':clr, 'Clean Sheets':cs, 'Penalty Kicks':pk,'Penalty Kick Goals':pkg}, ignore_index=True)
+
+goalkeeping_data[goalkeeping_data.columns] = goalkeeping_data.apply(lambda x: x.str.strip())
+
+goalkeeping_data.iloc[:,1:] = goalkeeping_data.iloc[:,1:].astype(int)
 
 
 # Streamlit
@@ -94,7 +216,7 @@ with c1:
     st.markdown('### Comparación de selecciones')
     plost.bar_chart(
     data=offensive_data,
-    bar=offensive_data['P'],
+    bar=offensive_data['Passes'],
     value='National selection')
 with c2:
     st.markdown('### Donut chart')
@@ -113,7 +235,7 @@ st.dataframe(offensive_data)
 
 pie_chart = px.pie(offensive_data,
                     title = 'Pases generados',
-                    values = 'P',
+                    values = 'Passes',
                     names = 'National selection')
 
 st.plotly_chart(pie_chart)
@@ -122,6 +244,12 @@ bar_chart = px.bar(offensive_data,
                     x = 'National selection',
                     y = medida,
                     text= medida,
-                    template = 'plotly_white')
+                    template = 'plotly_white',
+                    color = 'National selection',
+                    width = 1000,
+                    height= 600,
+                    title = f'Offensive variable (Total): {medida}')
+
+bar_chart.update_layout(barmode='stack', xaxis={'categoryorder': 'total descending'})
 
 st.plotly_chart(bar_chart)
