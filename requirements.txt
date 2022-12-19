@@ -1,4 +1,9 @@
-streamlit
-pandas
-requests
-BeautifulSoup
+streamlit==1.16.0
+pandas==1.1.3
+requests==2.24.0
+BeautifulSoup4==4.9.3
+plost==0.2.5
+Image
+plotly==4.14.3
+seaborn==0.11.0
+
