@@ -144,7 +144,7 @@ global_data.iloc[:,1:] = global_data.iloc[:,1:].astype('int64')
 
 # Web page to scrap goalkeeping data
 
-url4 = 'https://www.foxsports.com/soccer/fifa-world-cup-men/team-stats?category=standard&sort=t_g&season=2022&sortOrder=desc&groupId=12'
+url4 = 'https://www.foxsports.com/soccer/fifa-world-cup-men/team-stats?category=goalkeeping&sort=t_sv&season=2022&sortOrder=desc&groupId=12'
 
 # Download the content
 
@@ -208,12 +208,15 @@ medida = st.sidebar.selectbox('Medidas a comparar por equipo:', offensive_data.c
 st.sidebar.subheader('Datos Defensivos')
 medida_defensiva = st.sidebar.selectbox('Medidas a comparar por equipo:', defensive_data.columns[1:]) 
 
+st.sidebar.subheader('Datos de portería')
+medida_goalkeeping = st.sidebar.selectbox('Medidas a comparar por equipo:', goalkeeping_data.columns[1:])
+
 st.sidebar.markdown('''
 ---
 Created by Fabian Pedreros 
 
 - [Portfolio](https://fabianpedreros.github.io/Portfolio/)
-- [Linkedin ](www.linkedin.com/in/ing-fabian-pedreros)
+- [Linkedin ](https://www.linkedin.com/in/ing-fabian-pedreros/)
 ''')
 
 # Tab de datos ofensivos
@@ -672,3 +675,157 @@ with tabs[2]:
                     xaxis2={'side': 'top'},)
 
     st.plotly_chart(fig_d)
+
+
+# Tab de datos de portería
+with tabs[3]:   
+
+    st.markdown('### Datos de portería')
+
+
+    cm = sns.light_palette("red", as_cmap = True)
+
+
+    st.dataframe(goalkeeping_data.style.background_gradient(cmap=cm))
+
+
+    # Bar chart goalkeeping data
+    bar_chart_gk = px.bar(goalkeeping_data,
+                        x = 'National selection',
+                        y = medida_goalkeeping,
+                        text= medida_goalkeeping,
+                        template = 'plotly_white',
+                        color = 'National selection',
+                        width = 1000,
+                        height= 600,
+                        title = f'Goalkeeping variable (Total): {medida_goalkeeping}')
+
+    bar_chart_gk.update_layout(barmode='stack', xaxis={'categoryorder': 'total descending'})
+
+    st.plotly_chart(bar_chart_gk)
+
+
+    # transform goalkeeping data por partido
+    goalkeeping_data_pp = goalkeeping_data.copy()
+    goalkeeping_data_pp.iloc[:,1:] = goalkeeping_data_pp.iloc[:,1:].astype(int)
+
+    # global_data_pp
+
+    goalkeeping_data_pp.iloc[:,1:] = goalkeeping_data_pp.iloc[:,1:].div(pd.Series(goalkeeping_data['Games Played'], index = goalkeeping_data_pp.index), axis = 'index')
+
+    goalkeeping_data_pp=goalkeeping_data_pp.round(1)
+
+
+    # Show goalkeeping avg data table
+    st.markdown('**Datos promedio**')
+    st.dataframe(goalkeeping_data_pp.style.background_gradient(cmap=cm))
+
+    # Bar chart goalkeeping data por partido
+    bar_chart_gk_pp = px.bar(goalkeeping_data_pp,
+                        x = 'National selection',
+                        y = medida_goalkeeping,
+                        text= medida_goalkeeping,
+                        template = 'plotly_white',
+                        color = 'National selection',
+                        width = 1000,
+                        height= 600,
+                        title = f'Goalkeeping variable (Avg): {medida_goalkeeping}')
+
+    bar_chart_gk_pp.update_layout(barmode='stack', xaxis={'categoryorder': 'total descending'})
+
+    st.plotly_chart(bar_chart_gk_pp)
+
+    # Scatter for related measures
+
+    gk1 = goalkeeping_data_pp.columns[1:].sort_values(ascending = False)
+    gk2 = goalkeeping_data_pp.columns[1:].sort_values(ascending = True)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        medida_gk_pp_1 = st.selectbox('Medidas a comparar por equipo:', gk1) 
+
+    with c2:
+        medida_gk_pp_2 = st.selectbox('Medidas a comparar por equipo:', gk2)
+
+    scatter_gk_pp = px.scatter(goalkeeping_data_pp,
+                        x = medida_gk_pp_1,
+                        y = medida_gk_pp_2,
+                        text= 'National selection',
+                        template = 'plotly_white',
+                        color = 'National selection',
+                        width = 1000,
+                        height= 600,
+                        title = f'Goalkeeping variable (Avg):',
+                        trendline='ols')
+
+    scatter_gk_pp.update_traces(marker={'size': 20})
+
+    st.plotly_chart(scatter_gk_pp)
+
+    goalkeeping_data_pp_t=goalkeeping_data_pp.transpose()
+    goalkeeping_data_pp_t=goalkeeping_data_pp_t.reset_index()
+    goalkeeping_data_pp_t.columns = goalkeeping_data_pp_t.iloc[0]
+    goalkeeping_data_pp_t= goalkeeping_data_pp_t.drop(goalkeeping_data_pp_t.index[0])
+    #offensive_data_pp_t
+
+    st.markdown('#### Comparación entre selecciones (Avg)')
+
+    # Variables for butterfly plot
+
+    d1, d2 = st.columns(2)
+
+    with d1:
+        medida_gk_pp_b1 = st.selectbox('Selección:', [ 'Uruguay','Wales','United States', 'Tunisia', 'Switzerland', 'Spain',
+       'South Korea', 'Serbia', 'Senegal', 'Saudi Arabia', 'Qatar', 'Portugal',
+       'Poland', 'Netherlands', 'Morocco', 'Mexico', 'Japan', 'Iran', 'Ghana',
+       'Germany', 'France', 'England', 'Ecuador', 'Denmark', 'Croatia',
+       'Costa Rica', 'Canada', 'Cameroon', 'Belgium', 'Brazil',  'Australia',
+       'Argentina'])
+
+    with d2:
+        medida_gk_pp_b2 = st.selectbox('Selección:', ['Argentina', 'Australia', 'Brazil', 'Belgium',  'Cameroon', 'Canada',
+       'Costa Rica', 'Croatia', 'Denmark', 'Ecuador', 'England', 'France',
+       'Germany', 'Ghana', 'Iran', 'Japan', 'Mexico', 'Morocco', 'Netherlands',
+       'Poland', 'Portugal', 'Qatar', 'Saudi Arabia', 'Senegal', 'Serbia',
+       'South Korea', 'Spain', 'Switzerland', 'Tunisia', 'United States',
+       'Wales','Uruguay'])
+
+
+    #Butterfly plot goalkeeping data
+
+    fig_gk = make_subplots(rows=1, cols=2, specs=[[{}, {}]], shared_xaxes=False,
+                        shared_yaxes=True, horizontal_spacing=0)
+
+    fig_gk.append_trace(go.Bar(x=goalkeeping_data_pp_t[medida_gk_pp_b1],
+                        y=goalkeeping_data_pp_t.iloc[:,0], 
+                        text=goalkeeping_data_pp_t[medida_gk_pp_b1].map('{:,.1f}'.format), 
+                        textposition='inside',
+                        orientation='h', 
+                        width=0.7, 
+                        showlegend=False, 
+                        marker_color='#686cfc'), 
+                        1, 1) 
+
+
+    fig_gk.append_trace(go.Bar(x=goalkeeping_data_pp_t[medida_gk_pp_b2],
+                        y=goalkeeping_data_pp_t.iloc[:,0], 
+                        text=goalkeeping_data_pp_t[medida_gk_pp_b2].map('{:,.1f}'.format),
+                        textposition='inside',
+                        orientation='h', 
+                        width=0.7, 
+                        showlegend=False, 
+                        marker_color='#f0543c'), 
+                        1, 2) 
+
+    fig_gk.update_xaxes(showticklabels=False,title_text=medida_gk_pp_b1, row=1, col=1, range=[11,0])
+    fig_gk.update_xaxes(showticklabels=False,title_text=medida_gk_pp_b2, row=1, col=2, range=[0,11])
+
+    fig_gk.update_layout(title_text="Comparación entre selecciones", 
+                    width=800, 
+                    height=700,
+                    title_x=0.9,
+                    xaxis1={'side': 'top'},
+                    xaxis2={'side': 'top'},)
+
+    st.plotly_chart(fig_gk)
