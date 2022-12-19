@@ -6,4 +6,5 @@ plost==0.2.5
 Image
 plotly==5.11.0
 seaborn==0.11.0
+html5lib==1.1
 
