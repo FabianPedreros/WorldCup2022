@@ -1,13 +1,12 @@
 # 📦 FIFA World Cup Qatar 2022 
 ```
-⬆️ (Replace above with your app's name)
 ```
 
-Esta aplicación es un dashboard interactivo en el que el usuario puede visualizar información del desempeño de las selecciones prticipantes en el mundial de fútbol de Qatar, esta información esta seccionada en cuatros distintos aspectos:
+Esta aplicación es un dashboard interactivo en el que el usuario puede visualizar información del desempeño de las selecciones participantes en el mundial de fútbol de Qatar, esta información esta seccionada en cuatros distintos aspectos:
 
 - Información general (Goles, goles de tiro, goles de cabeza, goles concedidos, etc.)
 - Información ofensiva (Tiros realizados, tiros a puerta, posesión promedio, etc.)
-- Información defensiva (Intercepciones, tackles, Tiros a puerta, faltas, etc.)
+- Información defensiva (Intercepciones, tackles, tiros a puerta, faltas, etc.)
 - Información de la portería
 
 ## Aspectos técnicos
